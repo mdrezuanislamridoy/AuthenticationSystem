@@ -1,8 +1,6 @@
 import bcrypt from 'bcrypt';
 import {
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,

@@ -2,8 +2,8 @@ model ResetCode{
     id String @id @default(cuid())
 
     email String
-    code String
+    code Int
     isVerified Boolean @default(false)
-    
+
     createdAt DateTime @default(now())
 }

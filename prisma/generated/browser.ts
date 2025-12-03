@@ -33,6 +33,11 @@ export type ResetCode = Prisma.ResetCodeModel
  */
 export type ResetPassword = Prisma.ResetPasswordModel
 /**
+ * Model Sessions
+ * 
+ */
+export type Sessions = Prisma.SessionsModel
+/**
  * Model User
  * 
  */

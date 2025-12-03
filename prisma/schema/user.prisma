@@ -25,6 +25,7 @@ model User{
 
     //relations
     resetedPasswords ResetPassword[]
+    sessions Sessions[]
 
     createdAt DateTime @default(now())
     @@map("user")

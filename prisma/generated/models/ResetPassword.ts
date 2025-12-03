@@ -183,14 +183,14 @@ export type ResetPasswordOrderByWithRelationInput = {
 
 export type ResetPasswordWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  userId?: string
   AND?: Prisma.ResetPasswordWhereInput | Prisma.ResetPasswordWhereInput[]
   OR?: Prisma.ResetPasswordWhereInput[]
   NOT?: Prisma.ResetPasswordWhereInput | Prisma.ResetPasswordWhereInput[]
-  userId?: Prisma.StringFilter<"ResetPassword"> | string
   passwords?: Prisma.StringNullableListFilter<"ResetPassword">
   time?: Prisma.DateTimeFilter<"ResetPassword"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "userId">
 
 export type ResetPasswordOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

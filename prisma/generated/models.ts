@@ -11,6 +11,7 @@
 export type * from './models/Activity'
 export type * from './models/ResetCode'
 export type * from './models/ResetPassword'
+export type * from './models/Sessions'
 export type * from './models/User'
 export type * from './models/VerificationCode'
 export type * from './commonInputTypes'

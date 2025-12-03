@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   HttpException,
@@ -21,22 +22,23 @@ export class UserService {
     private mail: MailerService,
   ) {}
   async sendSignupCode(email: string) {
-    const isUser = await this.prisma.client.user.findFirst({
-      where: {
-        email: email,
-      },
-    });
+    try {
+      const isUser = await this.prisma.client.user.findFirst({
+        where: {
+          email: email,
+        },
+      });
 
-    if (isUser) {
-      throw new ConflictException('User already exists');
-    }
+      if (isUser) {
+        throw new ConflictException('User already exists');
+      }
 
-    const verificationCode = Math.ceil(100000 + Math.random() * 99999);
-    await this.mail.sendMail({
-      from: 'Auth Service',
-      to: email,
-      subject: "You've recieved a verification code from AuthSystem",
-      html: `
+      const verificationCode = Math.ceil(100000 + Math.random() * 99999);
+      await this.mail.sendMail({
+        from: 'Auth Service',
+        to: email,
+        subject: "You've recieved a verification code from AuthSystem",
+        html: `
         <h3>AuthSystem</h3>
         <p>You've recieved an code from AuthSystem</p>
 
@@ -45,118 +47,130 @@ export class UserService {
         <p>Please confirm the code to verify it's you</p>
         
         `,
-    });
+      });
 
-    const emails = await this.prisma.client.verificationCode.findMany({
-      where: { email },
-    });
-
-    if (emails) {
-      await this.prisma.client.verificationCode.deleteMany({
+      const emails = await this.prisma.client.verificationCode.findMany({
         where: { email },
       });
+
+      if (emails) {
+        await this.prisma.client.verificationCode.deleteMany({
+          where: { email },
+        });
+      }
+
+      await this.prisma.client.verificationCode.create({
+        data: {
+          email,
+          code: verificationCode,
+        },
+      });
+
+      return { message: 'Please verify your code to see the result' };
+    } catch (error) {
+      console.log(error);
     }
-
-    await this.prisma.client.verificationCode.create({
-      data: {
-        email,
-        code: verificationCode,
-      },
-    });
-
-    return { message: 'Please verify your code to see the result' };
   }
 
   async verifySignupCode(data: { email: string; verificationCode: string }) {
-    const code = Number(data.verificationCode);
+    try {
+      const code = Number(data.verificationCode);
 
-    const isValid = await this.prisma.client.verificationCode.findFirst({
-      where: {
-        email: data.email,
-        code,
-      },
-    });
+      const isValid = await this.prisma.client.verificationCode.findFirst({
+        where: {
+          email: data.email,
+          code,
+        },
+      });
 
-    const now: any = new Date();
-    const createdAt = new Date(isValid?.createdAt as Date);
+      const now: any = new Date();
+      const createdAt = new Date(isValid?.createdAt as Date);
 
-    const isValidInTime = now.getTime() - createdAt.getTime() > 15 * 60 * 1000;
+      const isValidInTime =
+        now.getTime() - createdAt.getTime() > 15 * 60 * 1000;
 
-    if (!isValid && !isValidInTime) {
-      throw new ForbiddenException("You're not valid or expired code");
+      if (!isValid && !isValidInTime) {
+        throw new ForbiddenException("You're not valid or expired code");
+      }
+
+      await this.prisma.client.verificationCode.update({
+        where: {
+          id: isValid?.id,
+        },
+        data: {
+          isVerified: true,
+        },
+      });
+
+      return {
+        message: 'email verified successfully',
+      };
+    } catch (error) {
+      console.log(error);
     }
-
-    await this.prisma.client.verificationCode.update({
-      where: {
-        id: isValid?.id,
-      },
-      data: {
-        isVerified: true,
-      },
-    });
-
-    return {
-      message: 'email verified successfully',
-    };
   }
 
   async register(userData: RegisterUser, profile: Express.Multer.File) {
-    const isValid = await this.prisma.client.verificationCode.findFirst({
-      where: { email: userData.email, isVerified: true },
-    });
-    if (!isValid) {
-      throw new ForbiddenException(
-        "You're not allowed to signup. Please verify first or login to your account",
-      );
-    }
-
-    if (!profile) {
-      throw new HttpException(
-        'Profile picture is missing',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const uploadStream = (file: Express.Multer.File) => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'authServiceProfile',
-          },
-          (err, data) => {
-            if (data) resolve(data);
-            else reject(err);
-          },
-        );
-        stream.end(file.buffer);
+    try {
+      const isValid = await this.prisma.client.verificationCode.findFirst({
+        where: { email: userData.email, isVerified: true },
       });
-    };
+      if (!isValid) {
+        throw new ForbiddenException(
+          "You're not allowed to signup. Please verify first or login to your account",
+        );
+      }
 
-    const result: UploadApiResponse = (await uploadStream(
-      profile,
-    )) as UploadApiResponse;
+      if (!profile) {
+        throw new HttpException(
+          'Profile picture is missing',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    const imageUrl = result.secure_url;
+      const uploadStream = (file: Express.Multer.File) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'authServiceProfile',
+            },
+            (err, data) => {
+              if (data) resolve(data);
+              else reject(err);
+            },
+          );
+          stream.end(file.buffer);
+        });
+      };
 
-    const hashedPass = await bcrypt.hash(userData.password, 10);
+      const result: UploadApiResponse = (await uploadStream(
+        profile,
+      )) as UploadApiResponse;
 
-    await this.prisma.client.user.create({
-      data: {
-        ...userData,
-        password: hashedPass,
-        profilePicture: imageUrl,
-      },
-    });
+      const imageUrl = result.secure_url;
 
-    await this.prisma.client.verificationCode.delete({
-      where: {
-        id: isValid.id,
-      },
-    });
+      const hashedPass = await bcrypt.hash(userData.password, 10);
 
-    return {
-      message: 'User created successfully, you can now join your account',
-    };
+      await this.prisma.client.user.create({
+        data: {
+          ...userData,
+          password: hashedPass,
+          profilePicture: imageUrl,
+        },
+      });
+
+      await this.prisma.client.verificationCode.delete({
+        where: {
+          id: isValid.id,
+        },
+      });
+
+      return {
+        message: 'User created successfully, you can now join your account',
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async profile(req: Request) {
@@ -187,10 +201,164 @@ export class UserService {
             <em style="background-color:red; color:white">Don't share with anyone</em>
           `,
       });
-    
-      
+
+      const emails = await this.prisma.client.verificationCode.findMany({
+        where: { email },
+      });
+
+      if (emails) {
+        await this.prisma.client.verificationCode.deleteMany({
+          where: { email },
+        });
+      }
+
+      await this.prisma.client.resetCode.create({
+        data: {
+          email,
+          code: verificationCode,
+        },
+      });
+
+      return {
+        message: 'Reset password email sent to your mail',
+      };
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async verifyResetCode(data: { email: string; verificationCode: string }) {
+    try {
+      const code = Number(data.verificationCode);
+      const isValid = await this.prisma.client.resetCode.findFirst({
+        where: {
+          email: data.email,
+          code,
+        },
+      });
+      if (!isValid) {
+        throw new ForbiddenException(
+          'Not allowed to reset or no account with this mail',
+        );
+      }
+
+      const now = new Date().getTime();
+
+      const createdAt = new Date(isValid.createdAt).getTime();
+
+      const ExpirationLimit = 15 * 60 * 1000;
+
+      if (now - createdAt > ExpirationLimit) {
+        throw new ForbiddenException(
+          'Your request to reset code is not valid yet',
+        );
+      }
+
+      await this.prisma.client.resetCode.update({
+        where: {
+          id: isValid.id,
+        },
+        data: {
+          isVerified: true,
+        },
+      });
+
+      return {
+        message: 'Code is verified, now you can change your password',
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async resetPassword(data: { email: string; password: string }) {
+    try {
+      const isValid = await this.prisma.client.resetCode.findFirst({
+        where: {
+          email: data.email,
+          isVerified: true,
+        },
+      });
+
+      if (!isValid) {
+        throw new ForbiddenException('Your request is invalid');
+      }
+
+      const user = await this.prisma.client.user.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+
+      if (!user || !user?.password) {
+        throw new BadRequestException('Invalid user or social login account');
+      }
+
+      const isPresentPassMatched = await bcrypt.compare(
+        data.password,
+        user?.password,
+      );
+      if (isPresentPassMatched) {
+        throw new ForbiddenException("You're already using this one");
+      }
+
+      let resetPassRecord = await this.prisma.client.resetPassword.findFirst({
+        where: { userId: user.id },
+      });
+
+      if (!resetPassRecord) {
+        resetPassRecord = await this.prisma.client.resetPassword.create({
+          data: {
+            userId: user.id,
+            passwords: [],
+          },
+        });
+      }
+
+      if (resetPassRecord) {
+        for (const oldPass of resetPassRecord.passwords) {
+          const isMatched = await bcrypt.compare(data.password, oldPass);
+          if (isMatched) {
+            throw new ForbiddenException(
+              'Password already used. Try another one',
+            );
+          }
+        }
+      }
+
+      const hashedPass = await bcrypt.hash(data.password, 10);
+
+      await this.prisma.client.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPass,
+        },
+      });
+
+      await this.prisma.client.resetPassword.update({
+        where: {
+          id: resetPassRecord.id,
+        },
+        data: {
+          passwords: {
+            push: user?.password!,
+          },
+        },
+      });
+
+      await this.prisma.client.resetCode.delete({
+        where: {
+          id: isValid.id,
+        },
+      });
+
+      return {
+        message: 'Password reset successfull',
+      };
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -54,6 +54,7 @@ export const ModelName = {
   Activity: 'Activity',
   ResetCode: 'ResetCode',
   ResetPassword: 'ResetPassword',
+  Sessions: 'Sessions',
   User: 'User',
   VerificationCode: 'VerificationCode'
 } as const
@@ -104,6 +105,17 @@ export const ResetPasswordScalarFieldEnum = {
 } as const
 
 export type ResetPasswordScalarFieldEnum = (typeof ResetPasswordScalarFieldEnum)[keyof typeof ResetPasswordScalarFieldEnum]
+
+
+export const SessionsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  jwtToken: 'jwtToken',
+  device: 'device',
+  ip: 'ip'
+} as const
+
+export type SessionsScalarFieldEnum = (typeof SessionsScalarFieldEnum)[keyof typeof SessionsScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

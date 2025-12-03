@@ -20,14 +20,24 @@ export type ResetCodeModel = runtime.Types.Result.DefaultSelection<Prisma.$Reset
 
 export type AggregateResetCode = {
   _count: ResetCodeCountAggregateOutputType | null
+  _avg: ResetCodeAvgAggregateOutputType | null
+  _sum: ResetCodeSumAggregateOutputType | null
   _min: ResetCodeMinAggregateOutputType | null
   _max: ResetCodeMaxAggregateOutputType | null
+}
+
+export type ResetCodeAvgAggregateOutputType = {
+  code: number | null
+}
+
+export type ResetCodeSumAggregateOutputType = {
+  code: number | null
 }
 
 export type ResetCodeMinAggregateOutputType = {
   id: string | null
   email: string | null
-  code: string | null
+  code: number | null
   isVerified: boolean | null
   createdAt: Date | null
 }
@@ -35,7 +45,7 @@ export type ResetCodeMinAggregateOutputType = {
 export type ResetCodeMaxAggregateOutputType = {
   id: string | null
   email: string | null
-  code: string | null
+  code: number | null
   isVerified: boolean | null
   createdAt: Date | null
 }
@@ -49,6 +59,14 @@ export type ResetCodeCountAggregateOutputType = {
   _all: number
 }
 
+
+export type ResetCodeAvgAggregateInputType = {
+  code?: true
+}
+
+export type ResetCodeSumAggregateInputType = {
+  code?: true
+}
 
 export type ResetCodeMinAggregateInputType = {
   id?: true
@@ -113,6 +131,18 @@ export type ResetCodeAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ResetCodeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ResetCodeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ResetCodeMinAggregateInputType
@@ -143,6 +173,8 @@ export type ResetCodeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: ResetCodeCountAggregateInputType | true
+  _avg?: ResetCodeAvgAggregateInputType
+  _sum?: ResetCodeSumAggregateInputType
   _min?: ResetCodeMinAggregateInputType
   _max?: ResetCodeMaxAggregateInputType
 }
@@ -150,10 +182,12 @@ export type ResetCodeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type ResetCodeGroupByOutputType = {
   id: string
   email: string
-  code: string
+  code: number
   isVerified: boolean
   createdAt: Date
   _count: ResetCodeCountAggregateOutputType | null
+  _avg: ResetCodeAvgAggregateOutputType | null
+  _sum: ResetCodeSumAggregateOutputType | null
   _min: ResetCodeMinAggregateOutputType | null
   _max: ResetCodeMaxAggregateOutputType | null
 }
@@ -179,7 +213,7 @@ export type ResetCodeWhereInput = {
   NOT?: Prisma.ResetCodeWhereInput | Prisma.ResetCodeWhereInput[]
   id?: Prisma.StringFilter<"ResetCode"> | string
   email?: Prisma.StringFilter<"ResetCode"> | string
-  code?: Prisma.StringFilter<"ResetCode"> | string
+  code?: Prisma.IntFilter<"ResetCode"> | number
   isVerified?: Prisma.BoolFilter<"ResetCode"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ResetCode"> | Date | string
 }
@@ -198,7 +232,7 @@ export type ResetCodeWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ResetCodeWhereInput[]
   NOT?: Prisma.ResetCodeWhereInput | Prisma.ResetCodeWhereInput[]
   email?: Prisma.StringFilter<"ResetCode"> | string
-  code?: Prisma.StringFilter<"ResetCode"> | string
+  code?: Prisma.IntFilter<"ResetCode"> | number
   isVerified?: Prisma.BoolFilter<"ResetCode"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ResetCode"> | Date | string
 }, "id">
@@ -210,8 +244,10 @@ export type ResetCodeOrderByWithAggregationInput = {
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ResetCodeCountOrderByAggregateInput
+  _avg?: Prisma.ResetCodeAvgOrderByAggregateInput
   _max?: Prisma.ResetCodeMaxOrderByAggregateInput
   _min?: Prisma.ResetCodeMinOrderByAggregateInput
+  _sum?: Prisma.ResetCodeSumOrderByAggregateInput
 }
 
 export type ResetCodeScalarWhereWithAggregatesInput = {
@@ -220,7 +256,7 @@ export type ResetCodeScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ResetCodeScalarWhereWithAggregatesInput | Prisma.ResetCodeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ResetCode"> | string
   email?: Prisma.StringWithAggregatesFilter<"ResetCode"> | string
-  code?: Prisma.StringWithAggregatesFilter<"ResetCode"> | string
+  code?: Prisma.IntWithAggregatesFilter<"ResetCode"> | number
   isVerified?: Prisma.BoolWithAggregatesFilter<"ResetCode"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ResetCode"> | Date | string
 }
@@ -228,7 +264,7 @@ export type ResetCodeScalarWhereWithAggregatesInput = {
 export type ResetCodeCreateInput = {
   id?: string
   email: string
-  code: string
+  code: number
   isVerified?: boolean
   createdAt?: Date | string
 }
@@ -236,7 +272,7 @@ export type ResetCodeCreateInput = {
 export type ResetCodeUncheckedCreateInput = {
   id?: string
   email: string
-  code: string
+  code: number
   isVerified?: boolean
   createdAt?: Date | string
 }
@@ -244,7 +280,7 @@ export type ResetCodeUncheckedCreateInput = {
 export type ResetCodeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.IntFieldUpdateOperationsInput | number
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -252,7 +288,7 @@ export type ResetCodeUpdateInput = {
 export type ResetCodeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.IntFieldUpdateOperationsInput | number
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -260,7 +296,7 @@ export type ResetCodeUncheckedUpdateInput = {
 export type ResetCodeCreateManyInput = {
   id?: string
   email: string
-  code: string
+  code: number
   isVerified?: boolean
   createdAt?: Date | string
 }
@@ -268,7 +304,7 @@ export type ResetCodeCreateManyInput = {
 export type ResetCodeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.IntFieldUpdateOperationsInput | number
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -276,7 +312,7 @@ export type ResetCodeUpdateManyMutationInput = {
 export type ResetCodeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.IntFieldUpdateOperationsInput | number
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -287,6 +323,10 @@ export type ResetCodeCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type ResetCodeAvgOrderByAggregateInput = {
+  code?: Prisma.SortOrder
 }
 
 export type ResetCodeMaxOrderByAggregateInput = {
@@ -303,6 +343,18 @@ export type ResetCodeMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type ResetCodeSumOrderByAggregateInput = {
+  code?: Prisma.SortOrder
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -351,7 +403,7 @@ export type $ResetCodePayload<ExtArgs extends runtime.Types.Extensions.InternalA
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     email: string
-    code: string
+    code: number
     isVerified: boolean
     createdAt: Date
   }, ExtArgs["result"]["resetCode"]>
@@ -779,7 +831,7 @@ export interface Prisma__ResetCodeClient<T, Null = never, ExtArgs extends runtim
 export interface ResetCodeFieldRefs {
   readonly id: Prisma.FieldRef<"ResetCode", 'String'>
   readonly email: Prisma.FieldRef<"ResetCode", 'String'>
-  readonly code: Prisma.FieldRef<"ResetCode", 'String'>
+  readonly code: Prisma.FieldRef<"ResetCode", 'Int'>
   readonly isVerified: Prisma.FieldRef<"ResetCode", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ResetCode", 'DateTime'>
 }
