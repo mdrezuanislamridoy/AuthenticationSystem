@@ -1,0 +1,34 @@
+enum Role {
+    student
+    faculty
+    recruiter
+    pro_partner
+    admin
+}
+
+enum Gender {
+    male
+    female
+    other
+}
+
+model User{
+    id String @id @default(cuid())
+
+    full_name String
+    email String
+    password String?
+    gender Gender?
+    dateOfBirth String?
+    profilePicture String?
+    role Role
+
+    //relations
+    resetedPasswords ResetPassword[]
+
+    createdAt DateTime @default(now())
+    @@map("user")
+}
+
+
+
