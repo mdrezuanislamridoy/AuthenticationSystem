@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 import { RegisterUser } from './dto/register-user-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { JwtGuard } from '@/lib/guards/auth.guard';
+import { JwtGuard } from '@/lib/guards/jwt/jwt.guard';
 
 @Controller('user')
 export class UserController {
@@ -54,9 +54,7 @@ export class UserController {
     return this.userService.resetPasswordCode(data.email);
   }
   @Post('verify-reset-code')
-  verifyResetCode(
-    @Body() data: { email: string; verificationCode: string },
-  ) {
+  verifyResetCode(@Body() data: { email: string; verificationCode: string }) {
     return this.userService.verifyResetCode(data);
   }
 

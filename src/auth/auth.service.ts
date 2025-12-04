@@ -9,6 +9,8 @@ import { LoginDto } from './dto/LoginDto';
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import { User } from '@prisma';
 import { JwtService } from '@nestjs/jwt';
+import { UAParser } from 'ua-parser-js';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +18,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
-  async login(data: LoginDto) {
+  async login(data: LoginDto, req: Request) {
     try {
       const user = await this.prisma.client.user.findFirst({
         where: {
@@ -43,14 +45,28 @@ export class AuthService {
 
       const tokens = this.generateToken(user);
 
+      const userAgent = req.header('User-Agent');
+
+      const parser = new UAParser(userAgent);
+
+      const session = await this.prisma.client.sessions.create({
+        data: {
+          userId: user.id,
+          jwtToken: tokens.accessToken,
+          ip: req.ip,
+          device: parser.getOS().name,
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        },
+      });
+
       return {
         message: 'User logged in successfully',
         result,
         accessToken: tokens.accessToken,
+        session,
       };
     } catch (error) {
-      //   throw new HttpException(error, HttpStatus.BAD_REQUEST);
-      console.log(error);
+      throw error;
     }
   }
 
@@ -79,5 +95,62 @@ export class AuthService {
         expiresIn: '7d',
       },
     );
+  }
+
+  async getActiveDevices(req: Request) {
+    if (!req.user) {
+      throw new ForbiddenException('Unauthorized request');
+    }
+
+    const payload = req.user;
+
+    try {
+      const sessions = await this.prisma.client.sessions.findMany({
+        where: {
+          userId: payload.sub,
+        },
+      });
+      return sessions;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async removeAllSession(req: Request) {
+    const payload = req.user;
+    if (!payload) {
+      throw new ForbiddenException("You're not yet logged in to do this");
+    }
+
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    console.log(token);
+
+    try {
+      await this.prisma.client.sessions.deleteMany({
+        where: {
+          userId: payload.sub,
+          NOT: { jwtToken: token },
+        },
+      });
+
+      return {
+        message: 'Removed all sessions',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async removeSession(sessionId: string) {
+    try {
+      await this.prisma.client.sessions.delete({
+        where: { id: sessionId },
+      });
+      return {
+        message: 'Session removed',
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }

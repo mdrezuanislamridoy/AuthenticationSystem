@@ -929,7 +929,8 @@ export const SessionsScalarFieldEnum = {
   userId: 'userId',
   jwtToken: 'jwtToken',
   device: 'device',
-  ip: 'ip'
+  ip: 'ip',
+  expiresAt: 'expiresAt'
 } as const
 
 export type SessionsScalarFieldEnum = (typeof SessionsScalarFieldEnum)[keyof typeof SessionsScalarFieldEnum]

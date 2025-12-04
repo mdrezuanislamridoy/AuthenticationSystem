@@ -4,7 +4,7 @@ model Sessions{
     jwtToken  String 
     device    String?
     ip        String?
-
+    expiresAt DateTime
     user User @relation(fields: [userId],references: [id])
 
     @@map("sessions")
