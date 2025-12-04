@@ -11,10 +11,15 @@ async function bootstrap() {
     .setDescription('API documentation')
     .setVersion('1.0')
     .addTag('example')
+    .addBasicAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,6 +28,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
   await app.listen(process.env.PORT ?? 3000);
 }
 

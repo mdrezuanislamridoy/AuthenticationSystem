@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from '@/lib/strategies/jwt.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtGuard } from '@/lib/guards/jwt/jwt.guard';
+import { GoogleStrategy } from '@/lib/strategies/google.strategy';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { JwtGuard } from '@/lib/guards/jwt/jwt.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtGuard, JwtService],
+  providers: [AuthService, JwtStrategy, JwtGuard, JwtService, GoogleStrategy],
   exports: [AuthModule],
 })
 export class AuthModule {}

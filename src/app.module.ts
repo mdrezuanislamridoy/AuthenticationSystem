@@ -6,10 +6,17 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 30000,
+        limit: 3,
+      },
+    ]),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     MailerModule.forRoot({
       transport: {

@@ -12,7 +12,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { RegisterUser } from './dto/register-user-dto';
 import bcrypt from 'bcrypt';
 import cloudinary from '@/lib/utils/cloudinary';
-import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+import { UploadApiResponse } from 'cloudinary';
 import { Request } from 'express';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class UserService {
 
       return { message: 'Please verify your code to see the result' };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -106,7 +106,7 @@ export class UserService {
         message: 'email verified successfully',
       };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -169,7 +169,7 @@ export class UserService {
         message: 'User created successfully, you can now join your account',
       };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -223,7 +223,7 @@ export class UserService {
         message: 'Reset password email sent to your mail',
       };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -267,7 +267,7 @@ export class UserService {
         message: 'Code is verified, now you can change your password',
       };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -296,7 +296,7 @@ export class UserService {
 
       const isPresentPassMatched = await bcrypt.compare(
         data.password,
-        user?.password,
+        user.password,
       );
       if (isPresentPassMatched) {
         throw new ForbiddenException("You're already using this one");

@@ -109,6 +109,7 @@ export class AuthService {
         where: {
           userId: payload.sub,
         },
+        orderBy: { expiresAt: 'desc' },
       });
       return sessions;
     } catch (error) {
@@ -152,5 +153,29 @@ export class AuthService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async handleJwtAuthCallback(data: any, req: Request) {
+    const { user, accessToken } = data;
+
+    const userAgent = req.header('User-Agent');
+    const parser = new UAParser(userAgent);
+
+    const session = await this.prisma.client.sessions.create({
+      data: {
+        userId: user.id,
+        jwtToken: accessToken,
+        ip: req.ip,
+        device: parser.getOS().name,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      },
+    });
+
+    return {
+      message: 'User logged in successfully',
+      result: data.user,
+      accessToken: accessToken,
+      session,
+    };
   }
 }
