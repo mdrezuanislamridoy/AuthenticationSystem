@@ -1,4 +1,4 @@
-## Done
+## Done ( 03-12-25 )
 
 1. Made Auth Feature
 2. Role Based Auth
@@ -13,3 +13,11 @@
   _ send signup code . <br/>
   _ verify signup code (email and verification code both string ),<br/>
   \_ reset password same as signup verification
+
+## Done ( 04-12-25 )
+
+1. OAuth Implementation
+2. Rate limiting using throttling
+3. Basic using of stripe
+4. Revision of Realtime Notification
+5. Exception and Custom Exception
