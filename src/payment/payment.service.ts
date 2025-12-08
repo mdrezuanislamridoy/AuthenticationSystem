@@ -17,4 +17,13 @@ export class PaymentService {
     });
     return paymentIntent;
   }
+
+  async createPaymentIntent(amount: number, currency: string = 'usd') {
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount,
+      currency,
+      payment_method_types: ['card'],
+    });
+    return paymentIntent;
+  }
 }

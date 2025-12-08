@@ -27,4 +27,14 @@ export class PaymentController {
   customError() {
     throw new CustomError('This is a custom error', HttpStatus.BAD_REQUEST);
   }
+
+  @Post('create-payment-intent')
+  async createPayment(@Body() body: { amount: number }) {
+    const paymentIntent = await this.paymentService.createPaymentIntent(
+      body.amount,
+    );
+    return {
+      clientSecret: paymentIntent.client_secret,
+    };
+  }
 }

@@ -9,6 +9,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PaymentModule } from './payment/payment.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { PaymentModule } from './payment/payment.module';
       defaults: {
         from: '"No Reply" <noreply@example.com>',
       },
+    }),
+    CacheModule.register({
+      ttl: 10000,
+      isGlobal: true,
     }),
     PrismaModule,
     UserModule,

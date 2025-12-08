@@ -24,34 +24,25 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ) {
-    const { id, name, emails, photos } = profile;
+    const { emails, photos } = profile;
 
-    let user = await this.prisma.client.user.findFirst({
+    const user = await this.prisma.client.user.upsert({
       where: {
         email: emails[0].value,
       },
+      create: {
+        full_name: profile.displayName,
+        email: emails[0].value,
+        role: 'student',
+        profilePicture: photos[0].value,
+      },
+      update: {
+        full_name: profile.displayName,
+        role: 'student',
+        profilePicture: photos[0].value,
+      },
     });
 
-    if (!user) {
-      user = await this.prisma.client.user.create({
-        data: {
-          full_name: profile.displayName,
-          email: emails[0].value,
-          role: 'student',
-          profilePicture: photos[0].value,
-        },
-      });
-    } else {
-      user = await this.prisma.client.user.update({
-        where: { id: user.id },
-        data: {
-          full_name: profile.displayName,
-          email: emails[0].value,
-          role: 'student',
-          profilePicture: photos[0].value,
-        },
-      });
-    }
     const accessToken = this.jwtService.sign(
       { id: user.id, email: user.email, role: user.role },
       {
