@@ -1,98 +1,203 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+## AUTH API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+POST /auth/login
+Body
+{
+"email": "string",
+"password": "string"
+}
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+GET /auth/active-devices
+Headers → Authorization: Bearer <token>
 
-## Description
+POST /auth/remove-all-session
+Headers → Authorization: Bearer <token>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+POST /auth/remove-session/:id
+Headers → Authorization: Bearer <token>
 
-## Project setup
+GET /auth/google
+(No data)
 
-```bash
-$ npm install
-```
+GET /auth/google/callback
+(No data)
 
-## Compile and run the project
+## USER API
 
-```bash
-# development
-$ npm run start
+POST /user/send-signup-code
+Body
+{
+"email": "string"
+}
 
-# watch mode
-$ npm run start:dev
+POST /user/resend-signup-code
+Body
+{
+"email": "string"
+}
 
-# production mode
-$ npm run start:prod
-```
+POST /user/verify-email
+Body
+{
+"email": "string",
+"verificationCode": "string"
+}
 
-## Run tests
+POST /user/register
+Form-Data
+full_name: string
+email: string
+gender: male | female | other
+dateOfBirth: string
+password: string
+role: student | faculty | recruiter | pro_partner
+profile: file (optional)
 
-```bash
-# unit tests
-$ npm run test
+GET /user/profile
+Headers → Authorization: Bearer <token>
 
-# e2e tests
-$ npm run test:e2e
+POST /user/reset-password-code
+Body
+{
+"email": "string"
+}
 
-# test coverage
-$ npm run test:cov
-```
+POST /user/verify-reset-code
+Body
+{
+"email": "string",
+"verificationCode": "string"
+}
 
-## Deployment
+PATCH /user/reset-password
+Body
+{
+"email": "string",
+"password": "string"
+}
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## CONVERSATION API
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+POST /conversaton/create
+Headers → Authorization: Bearer <token>
+Body
+{
+"senderId": "string",
+"receiverId": "string"
+}
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+GET /conversaton/:id
+Headers → Authorization: Bearer <token>
+(No body)
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+POST /conversaton/create-group
+Headers → Authorization: Bearer <token>
+Body
+{
+"name": "string",
+"groupMenmbers": ["string", "string"]
+}
 
-## Resources
+## MESSAGE API
 
-Check out a few resources that may come in handy when working with NestJS:
+POST /message/create
+Headers → Authorization: Bearer <token>
+Body
+{
+"conversationId": "string",
+"senderId": "string",
+"message": "string"
+}
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+GET /message/get-messages
+Headers → Authorization: Bearer <token>:
+Body
+{
+"conversationId": "string"
+}
 
-## Support
+GET /message/get-conversation-participants?conversationId=ID
+Headers → Authorization: Bearer <token>
+Query:
+conversationId=string
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Here is the pure WebSocket API documentation for your ChatGateway — only events + required payloads, clean and ready to share.
 
-## Stay in touch
+## 🔌 WebSocket API (Socket.io)
+Connection
+To connect, the client must send JWT token in one of these:
+Option 1 → Header
+authorization: Bearer <token>
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Option 2 → Auth
+auth: { token: "<token>" }
 
-## License
+Option 3 → Query
+ws://localhost:3000?token=<token>
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+If token is invalid → connection refused.
+
+## 📌 EVENTS
+
+1. join-conversation
+   Join a direct conversation room.
+   Client → Server
+   Event: join-conversation
+   Payload:
+   {
+   "conversationId": "string"
+   }
+
+2. send-message
+   Send a message to a direct conversation.
+   Client → Server
+   Event: send-message
+   Payload:
+   {
+   "conversationId": "string",
+   "message": "string"
+   }
+
+Server → Client (Room)
+Event: receive-message
+Payload:
+Message object returned from backend
+{
+"id": "string",
+"message": "string",
+"senderId": "string",
+"conversationId": "string",
+"createdAt": "date"
+}
+
+## GROUP CHAT EVENTS
+
+3. join-group
+   Join a group conversation room.
+   Client → Server
+   Event: join-group
+   Payload:
+   {
+   "conversation": "string"
+   }
+
+4. send-group-message
+   Send message to a group conversation.
+   Client → Server
+   Event: send-group-message
+   Payload:
+   {
+   "conversationId": "string",
+   "message": "string"
+   }
+
+Server → Client (Room)
+Event: receive-group-message
+Payload:
+{
+"id": "string",
+"message": "string",
+"senderId": "string",
+"conversationId": "string",
+"createdAt": "date"
+}

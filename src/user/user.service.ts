@@ -24,49 +24,66 @@ export class UserService {
   async sendSignupCode(email: string) {
     try {
       const isUser = await this.prisma.client.user.findFirst({
-        where: {
-          email: email,
-        },
+        where: { email },
       });
 
       if (isUser) {
         throw new ConflictException('User already exists');
       }
 
-      const verificationCode = Math.ceil(100000 + Math.random() * 99999);
-      await this.mail.sendMail({
-        from: 'Auth Service',
-        to: email,
-        subject: "You've recieved a verification code from AuthSystem",
-        html: `
-        <h3>AuthSystem</h3>
-        <p>You've recieved an code from AuthSystem</p>
-
-        <h2>${verificationCode}</h2>
-
-        <p>Please confirm the code to verify it's you</p>
-        
-        `,
-      });
-
-      const emails = await this.prisma.client.verificationCode.findMany({
+      const existing = await this.prisma.client.verificationCode.findFirst({
         where: { email },
+        orderBy: { createdAt: 'desc' },
       });
 
-      if (emails) {
-        await this.prisma.client.verificationCode.deleteMany({
-          where: { email },
+      let finalCode: number;
+
+      if (existing) {
+        const now = new Date();
+        const createdAt = new Date(existing.createdAt);
+
+        const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+
+        if (diffMinutes < 15) {
+          finalCode = existing.code;
+        } else {
+          await this.prisma.client.verificationCode.deleteMany({
+            where: { email },
+          });
+
+          finalCode = Math.floor(100000 + Math.random() * 900000);
+
+          await this.prisma.client.verificationCode.create({
+            data: {
+              email,
+              code: finalCode,
+            },
+          });
+        }
+      } else {
+        finalCode = Math.floor(100000 + Math.random() * 900000);
+
+        await this.prisma.client.verificationCode.create({
+          data: {
+            email,
+            code: finalCode,
+          },
         });
       }
 
-      await this.prisma.client.verificationCode.create({
-        data: {
-          email,
-          code: verificationCode,
-        },
+      await this.mail.sendMail({
+        from: 'Auth Service',
+        to: email,
+        subject: "You've received a verification code from AuthSystem",
+        html: `
+        <h3>AuthSystem</h3>
+        <p>Your email verification code:</p>
+        <h2>${finalCode}</h2>
+        <p>This code is valid for 15 minutes.</p>
+      `,
       });
 
-      return { message: 'Please verify your code to see the result' };
+      return { message: 'Verification code sent successfully' };
     } catch (error) {
       throw error;
     }
