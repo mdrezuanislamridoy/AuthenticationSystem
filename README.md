@@ -1,27 +1,3 @@
-## AUTH API
-
-POST /auth/login
-Body
-{
-"email": "string",
-"password": "string"
-}
-
-GET /auth/active-devices
-Headers → Authorization: Bearer <token>
-
-POST /auth/remove-all-session
-Headers → Authorization: Bearer <token>
-
-POST /auth/remove-session/:id
-Headers → Authorization: Bearer <token>
-
-GET /auth/google
-(No data)
-
-GET /auth/google/callback
-(No data)
-
 ## USER API
 
 POST /user/send-signup-code
@@ -75,6 +51,30 @@ Body
 "email": "string",
 "password": "string"
 }
+
+## AUTH API
+
+POST /auth/login
+Body
+{
+"email": "string",
+"password": "string"
+}
+
+GET /auth/active-devices
+Headers → Authorization: Bearer <token>
+
+POST /auth/remove-all-session
+Headers → Authorization: Bearer <token>
+
+POST /auth/remove-session/:id
+Headers → Authorization: Bearer <token>
+
+GET /auth/google
+(No data)
+
+GET /auth/google/callback
+(No data)
 
 ## CONVERSATION API
 
