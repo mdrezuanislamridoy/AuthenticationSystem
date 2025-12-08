@@ -10,6 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PaymentModule } from './payment/payment.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { MessageModule } from './message/message.module';
+import { ConversatonModule } from './conversaton/conversaton.module';
+import { ChatGateway } from './message/message.gataway';
+import { MessageService } from './message/message.service';
 
 @Module({
   imports: [
@@ -41,8 +45,10 @@ import { CacheModule } from '@nestjs/cache-manager';
     UserModule,
     AuthModule,
     PaymentModule,
+    MessageModule,
+    ConversatonModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JwtService],
+  providers: [AppService, JwtService, ChatGateway, MessageService],
 })
 export class AppModule {}

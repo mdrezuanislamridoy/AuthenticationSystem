@@ -9,6 +9,22 @@
 * 🟢 You can import this file directly.
 */
 
+export const ConversationType = {
+  direct: 'direct',
+  group: 'group'
+} as const
+
+export type ConversationType = (typeof ConversationType)[keyof typeof ConversationType]
+
+
+export const ParticipantRole = {
+  admin: 'admin',
+  user: 'user'
+} as const
+
+export type ParticipantRole = (typeof ParticipantRole)[keyof typeof ParticipantRole]
+
+
 export const Role = {
   student: 'student',
   faculty: 'faculty',

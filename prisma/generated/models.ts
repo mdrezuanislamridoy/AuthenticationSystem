@@ -9,6 +9,9 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Activity'
+export type * from './models/Conversation'
+export type * from './models/Message'
+export type * from './models/Participant'
 export type * from './models/ResetCode'
 export type * from './models/ResetPassword'
 export type * from './models/Sessions'

@@ -1,0 +1,14 @@
+model Conversation{
+    id String @id @default(cuid())
+
+    conversationType ConversationType
+    name        String?
+
+    participents Participant[]
+    messages Message[]
+}
+
+enum ConversationType {
+    direct
+    group
+}

@@ -43,6 +43,21 @@ export { Prisma }
  */
 export type Activity = Prisma.ActivityModel
 /**
+ * Model Conversation
+ * 
+ */
+export type Conversation = Prisma.ConversationModel
+/**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
+/**
+ * Model Participant
+ * 
+ */
+export type Participant = Prisma.ParticipantModel
+/**
  * Model ResetCode
  * 
  */
